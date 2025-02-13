@@ -1,0 +1,360 @@
+.container {
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100vh;
+  position: relative;
+}
+
+.logo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  padding: 1.5rem;
+  background-color: white;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  background-color: #000;
+  color: #fff;
+}
+
+.formWrapper {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem;
+  padding-top: 6rem;
+  height: calc(100vh - 4rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.form {
+  width: 100%;
+  max-width: 20rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.formIcon {
+  width: 48px;
+  height: 48px;
+  background-color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.formIcon svg {
+  color: white;
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.formSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.passwordInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInputWrapper input {
+  padding-right: 4rem;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s;
+}
+
+.passwordToggle:hover {
+  color: #007bff;
+}
+
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profilePicture {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadPlaceholder {
+  color: #9ca3af;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadButton {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #000;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.uploadButton:hover {
+  background-color: #e5e7eb;
+}
+
+.fileInput {
+  display: none;
+}
+
+.accountTypeContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.accountType {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.accountType:hover {
+  border-color: #000;
+}
+
+.accountType.selected {
+  border-color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.accountType input[type="radio"] {
+  display: none;
+}
+
+.accountType svg {
+  width: 24px;
+  height: 24px;
+  color: #000;
+}
+
+.button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.button:hover {
+  background-color: #1a1a1a;
+}
+
+.loginText {
+  font-size: 0.875rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.loginLink {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.loginLink:hover {
+  text-decoration: underline;
+}
+
+.imageContainer {
+  width: 50%;
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.2) brightness(0.8);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+}
+
+.error {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.recaptchaWrapper {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recaptchaWrapper > div {
+  margin-bottom: 1rem;
+}
+
+.recaptchaWrapper iframe {
+  border-radius: 4px;
+}
+
+/* Custom scrollbar styles for webkit browsers */
+.formWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formWrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.formWrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.formWrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    width: 100%;
+  }
+
+  .imageContainer {
+    display: none;
+  }
+
+  .logo {
+    width: 100%;
+  }
+}

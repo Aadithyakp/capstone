@@ -205,10 +205,6 @@ export default function GymOwnerDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
@@ -338,9 +334,7 @@ export default function GymOwnerDashboard() {
           <button className={styles.notificationBtn}>
             <i className="fas fa-bell"></i>
           </button>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            Logout
-          </button>
+          
         </div>
       </header>
 

@@ -12,9 +12,9 @@ const classSchema = new mongoose.Schema({
     trim: true
   },
   instructor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: String,
+    required: true,
+    trim: true
   },
   description: {
     type: String,

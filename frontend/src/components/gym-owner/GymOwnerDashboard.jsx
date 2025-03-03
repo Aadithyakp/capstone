@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGymByOwner, getGymClasses, createClass, updateClass, deleteClass, updateGym, createGym, logout } from '../../utils/api';
+import { getGymByOwner, getGymClasses, createClass, updateClass, deleteClass, updateGym, createGym, logout, getInstructors } from '../../utils/api';
 import styles from './GymOwnerDashboard.module.css';
+
+const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const CLASS_TYPES = ['Yoga', 'HIIT', 'Strength', 'Cardio', 'Pilates', 'Other'];
+const CLASS_LEVELS = ['beginner', 'intermediate', 'advanced', 'all'];
 
 export default function GymOwnerDashboard() {
   const navigate = useNavigate();
@@ -39,9 +43,9 @@ export default function GymOwnerDashboard() {
 
   const [classFormData, setClassFormData] = useState({
     name: '',
+    instructor: '', 
     description: '',
     type: 'Yoga',
-    instructor: '', 
     schedule: {
       dayOfWeek: 'monday',
       startTime: '09:00',
@@ -51,8 +55,11 @@ export default function GymOwnerDashboard() {
     level: 'beginner'
   });
 
+  const [instructors, setInstructors] = useState([]);
+
   useEffect(() => {
     fetchData();
+    fetchInstructors();
   }, []);
 
   const fetchData = async () => {
@@ -74,6 +81,16 @@ export default function GymOwnerDashboard() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchInstructors = async () => {
+    try {
+      const data = await getInstructors();
+      setInstructors(data);
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+      // Don't set error state as this is not critical
     }
   };
 
@@ -126,7 +143,9 @@ export default function GymOwnerDashboard() {
 
       const classData = {
         ...classFormData,
-        instructor: user._id // Set the instructor to the current user
+        gym: gymData._id,
+        // Ensure we're using the instructor name, not ID
+        instructor: classFormData.instructor
       };
 
       const newClass = await createClass(gymData._id, classData);
@@ -137,9 +156,9 @@ export default function GymOwnerDashboard() {
       // Reset form data
       setClassFormData({
         name: '',
+        instructor: '',
         description: '',
         type: 'Yoga',
-        instructor: '',
         schedule: {
           dayOfWeek: 'monday',
           startTime: '09:00',
@@ -332,306 +351,504 @@ export default function GymOwnerDashboard() {
   return (
     <div className={styles.dashboard}>
       <header className={styles.header}>
-        <h1>Gym Owner Dashboard</h1>
-        <div className={styles.userInfo}>
-          <span>Welcome back, {gymData?.owner?.name}</span>
-          <button className={styles.notificationBtn}>
-            <i className="fas fa-bell"></i>
-          </button>
+        <div className={styles.headerLeft}>
+          <h1>Gym Owner Dashboard</h1>
+        </div>
+        <div className={styles.headerRight}>
+          <nav className={styles.navigation}>
+            <button 
+              className={`${styles.navButton} ${activeTab === 'overview' ? styles.active : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button 
+              className={`${styles.navButton} ${activeTab === 'classes' ? styles.active : ''}`}
+              onClick={() => setActiveTab('classes')}
+            >
+              Classes
+            </button>
+            <button 
+              className={`${styles.navButton} ${activeTab === 'members' ? styles.active : ''}`}
+              onClick={() => setActiveTab('members')}
+            >
+              Members
+            </button>
+            <button 
+              className={`${styles.navButton} ${activeTab === 'settings' ? styles.active : ''}`}
+              onClick={() => setActiveTab('settings')}
+            >
+              Settings
+            </button>
+          </nav>
           <button onClick={handleLogout} className={styles.logoutButton}>
             Logout
           </button>
         </div>
       </header>
 
-      <nav className={styles.navigation}>
-        <button
-          className={`${styles.navButton} ${activeTab === 'overview' ? styles.active : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
-          Overview
-        </button>
-        <button
-          className={`${styles.navButton} ${activeTab === 'members' ? styles.active : ''}`}
-          onClick={() => setActiveTab('members')}
-        >
-          Members
-        </button>
-        <button
-          className={`${styles.navButton} ${activeTab === 'classes' ? styles.active : ''}`}
-          onClick={() => setActiveTab('classes')}
-        >
-          Classes
-        </button>
-        <button
-          className={`${styles.navButton} ${activeTab === 'settings' ? styles.active : ''}`}
-          onClick={() => setActiveTab('settings')}
-        >
-          Settings
-        </button>
-      </nav>
-
-      <main className={styles.content}>
-        {activeTab === 'overview' && (
-          <div className={styles.overview}>
-            <div className={styles.statsGrid}>
-              <div className={styles.statCard}>
-                <h3>Total Members</h3>
-                <p className={styles.statNumber}>{gymData?.memberCount || 0}</p>
-              </div>
-              <div className={styles.statCard}>
-                <h3>Active Classes</h3>
-                <p className={styles.statNumber}>{classes.length}</p>
-              </div>
-              <div className={styles.statCard}>
-                <h3>Total Revenue</h3>
-                <p className={styles.statNumber}>${gymData?.revenue || 0}</p>
+      <div className={styles.content}>
+        {gymData ? (
+          <>
+            <div className={styles.gymInfo}>
+              <h2>{gymData.name}</h2>
+              <div className={styles.details}>
+                <div className={styles.section}>
+                  <h3>Address</h3>
+                  <p>{gymData.address.street}</p>
+                  <p>{gymData.address.city}, {gymData.address.state} {gymData.address.zipCode}</p>
+                </div>
+                <div className={styles.section}>
+                  <h3>Contact</h3>
+                  <p>Phone: {gymData.contact.phone}</p>
+                  <p>Email: {gymData.contact.email}</p>
+                </div>
               </div>
             </div>
 
-            <div className={styles.upcomingClasses}>
-              <h2>Today's Classes</h2>
-              <div className={styles.classGrid}>
-                {classes.filter(c => {
-                  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-                  const today = days[new Date().getDay()];
-                  return c.schedule.dayOfWeek === today;
-                }).map((classItem) => (
-                  <div key={classItem._id} className={styles.classCard}>
-                    <h3>{classItem.name}</h3>
-                    <p>{classItem.schedule.startTime} - {classItem.schedule.endTime}</p>
-                    <p>{classItem.type} - {classItem.level}</p>
-                    <p>{classItem.capacity} spots available</p>
+            {activeTab === 'overview' && (
+              <div className={styles.overviewSection}>
+                <div className={styles.statsGrid}>
+                  <div className={styles.statCard}>
+                    <h3>Total Members</h3>
+                    <p className={styles.statNumber}>
+                      {gymData.members ? gymData.members.length : 0}
+                    </p>
+                    <p className={styles.statLabel}>Active Members</p>
                   </div>
-                ))}
-                {classes.filter(c => {
-                  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-                  const today = days[new Date().getDay()];
-                  return c.schedule.dayOfWeek === today;
-                }).length === 0 && (
-                  <p className={styles.noClasses}>No classes scheduled for today</p>
-                )}
+                  <div className={styles.statCard}>
+                    <h3>Total Classes</h3>
+                    <p className={styles.statNumber}>{classes.length}</p>
+                    <p className={styles.statLabel}>Classes Offered</p>
+                  </div>
+                  <div className={styles.statCard}>
+                    <h3>Today's Classes</h3>
+                    <p className={styles.statNumber}>
+                      {classes.filter(c => {
+                        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                        const today = days[new Date().getDay()];
+                        return c.schedule.dayOfWeek === today;
+                      }).length}
+                    </p>
+                    <p className={styles.statLabel}>Classes Today</p>
+                  </div>
+                </div>
+
+                <div className={styles.todaysClasses}>
+                  <div className={styles.sectionHeader}>
+                    <h2>Today's Schedule</h2>
+                  </div>
+                  <div className={styles.classTimelineGrid}>
+                    {classes
+                      .filter(c => {
+                        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                        const today = days[new Date().getDay()];
+                        return c.schedule.dayOfWeek === today;
+                      })
+                      .sort((a, b) => {
+                        const timeA = a.schedule.startTime.split(':').map(Number);
+                        const timeB = b.schedule.startTime.split(':').map(Number);
+                        return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
+                      })
+                      .map(classItem => (
+                        <div key={classItem._id} className={styles.timelineCard}>
+                          <div className={styles.timeSlot}>
+                            <span className={styles.startTime}>{classItem.schedule.startTime}</span>
+                            <span className={styles.endTime}>{classItem.schedule.endTime}</span>
+                          </div>
+                          <div className={styles.timelineContent}>
+                            <div className={styles.timelineHeader}>
+                              <h3>{classItem.name}</h3>
+                              <span className={styles.classType}>{classItem.type}</span>
+                            </div>
+                            <p className={styles.timelineInstructor}>
+                              <strong>Instructor:</strong> {classItem.instructor}
+                            </p>
+                            <div className={styles.timelineFooter}>
+                              <span className={styles.classLevel}>
+                                Level: {classItem.level.charAt(0).toUpperCase() + classItem.level.slice(1)}
+                              </span>
+                              <span className={styles.classCapacity}>
+                                Capacity: {classItem.capacity}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    {classes.filter(c => {
+                      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                      const today = days[new Date().getDay()];
+                      return c.schedule.dayOfWeek === today;
+                    }).length === 0 && (
+                      <p className={styles.noClasses}>No classes scheduled for today</p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'classes' && (
-          <div className={styles.classes}>
-            <div className={styles.actionBar}>
-              <button 
-                className={styles.addButton}
-                onClick={() => setShowClassForm(true)}
-              >
-                Create New Class
-              </button>
-            </div>
-
-            {showClassForm && (
-              <form onSubmit={handleCreateClass} className={styles.classForm}>
-                <div className={styles.formGroup}>
-                  <label>Class Name</label>
-                  <input
-                    type="text"
-                    value={classFormData.name}
-                    onChange={(e) => setClassFormData(prev => ({
-                      ...prev,
-                      name: e.target.value
-                    }))}
-                    required
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Description</label>
-                  <textarea
-                    value={classFormData.description}
-                    onChange={(e) => setClassFormData(prev => ({
-                      ...prev,
-                      description: e.target.value
-                    }))}
-                    required
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Type</label>
-                  <select
-                    value={classFormData.type}
-                    onChange={(e) => setClassFormData(prev => ({
-                      ...prev,
-                      type: e.target.value
-                    }))}
-                  >
-                    <option value="Yoga">Yoga</option>
-                    <option value="HIIT">HIIT</option>
-                    <option value="Strength">Strength</option>
-                    <option value="Cardio">Cardio</option>
-                    <option value="Pilates">Pilates</option>
-                  </select>
-                </div>
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label>Day</label>
-                    <select
-                      value={classFormData.schedule.dayOfWeek}
-                      onChange={(e) => setClassFormData(prev => ({
-                        ...prev,
-                        schedule: { ...prev.schedule, dayOfWeek: e.target.value }
-                      }))}
-                    >
-                      <option value="monday">Monday</option>
-                      <option value="tuesday">Tuesday</option>
-                      <option value="wednesday">Wednesday</option>
-                      <option value="thursday">Thursday</option>
-                      <option value="friday">Friday</option>
-                      <option value="saturday">Saturday</option>
-                      <option value="sunday">Sunday</option>
-                    </select>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Start Time</label>
-                    <input
-                      type="time"
-                      value={classFormData.schedule.startTime}
-                      onChange={(e) => setClassFormData(prev => ({
-                        ...prev,
-                        schedule: { ...prev.schedule, startTime: e.target.value }
-                      }))}
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>End Time</label>
-                    <input
-                      type="time"
-                      value={classFormData.schedule.endTime}
-                      onChange={(e) => setClassFormData(prev => ({
-                        ...prev,
-                        schedule: { ...prev.schedule, endTime: e.target.value }
-                      }))}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label>Capacity</label>
-                    <input
-                      type="number"
-                      value={classFormData.capacity}
-                      onChange={(e) => setClassFormData(prev => ({
-                        ...prev,
-                        capacity: parseInt(e.target.value)
-                      }))}
-                      min="1"
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Level</label>
-                    <select
-                      value={classFormData.level}
-                      onChange={(e) => setClassFormData(prev => ({
-                        ...prev,
-                        level: e.target.value
-                      }))}
-                    >
-                      <option value="beginner">Beginner</option>
-                      <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced</option>
-                      <option value="all">All Levels</option>
-                    </select>
-                  </div>
-                </div>
-                <div className={styles.formActions}>
-                  <button type="submit" className={styles.submitButton}>
-                    Create Class
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.cancelButton}
-                    onClick={() => setShowClassForm(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
             )}
 
-            <div className={styles.classGrid}>
-              {classes.map((classItem) => (
-                <div key={classItem._id} className={styles.classCard}>
-                  <h3>{classItem.name}</h3>
-                  <p>{classItem.description}</p>
-                  <p>Type: {classItem.type}</p>
-                  <p>Schedule: {classItem.schedule.dayOfWeek} {classItem.schedule.startTime}-{classItem.schedule.endTime}</p>
-                  <p>Capacity: {classItem.enrolledMembers.length}/{classItem.capacity}</p>
-                  <p>Level: {classItem.level}</p>
-                  <div className={styles.cardActions}>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => handleDeleteClass(classItem._id)}
-                    >
-                      Delete Class
+            {activeTab === 'classes' && (
+              <div className={styles.classesSection}>
+                <div className={styles.sectionHeader}>
+                  <h2>Classes</h2>
+                  <button onClick={() => setShowClassForm(true)} className={styles.addButton}>
+                    Add New Class
+                  </button>
+                </div>
+
+                <div className={styles.classList}>
+                  {classes.map(classItem => (
+                    <div key={classItem._id} className={styles.classCard}>
+                      <div className={styles.classHeader}>
+                        <h3>{classItem.name}</h3>
+                        <div className={styles.headerDetails}>
+                          <span className={styles.classType}>{classItem.type}</span>
+                          <span className={styles.instructorName}>
+                            {classItem.instructor}
+                          </span>
+                        </div>
+                      </div>
+                      <p className={styles.classDescription}>{classItem.description}</p>
+                      <div className={styles.classDetails}>
+                        <p>
+                          <strong>Schedule:</strong> {classItem.schedule.dayOfWeek.charAt(0).toUpperCase() + 
+                          classItem.schedule.dayOfWeek.slice(1)} at {classItem.schedule.startTime}-{classItem.schedule.endTime}
+                        </p>
+                        <p><strong>Level:</strong> {classItem.level.charAt(0).toUpperCase() + classItem.level.slice(1)}</p>
+                        <p><strong>Capacity:</strong> {classItem.capacity}</p>
+                      </div>
+                      <div className={styles.cardActions}>
+                        <button
+                          onClick={() => {
+                            setClassFormData({
+                              ...classItem,
+                              instructor: classItem.instructor
+                            });
+                            setShowClassForm(true);
+                          }}
+                          className={styles.editButton}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClass(classItem._id)}
+                          className={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'members' && (
+              <div className={styles.membersSection}>
+                <div className={styles.sectionHeader}>
+                  <h2>Members</h2>
+                  <button className={styles.addButton}>
+                    Add Member
+                  </button>
+                </div>
+                <div className={styles.membersList}>
+                  {gymData.members && gymData.members.length > 0 ? (
+                    <div className={styles.membersGrid}>
+                      {gymData.members.map(member => (
+                        <div key={member._id} className={styles.memberCard}>
+                          <div className={styles.memberHeader}>
+                            <h3>{member.name}</h3>
+                            <span className={styles.membershipStatus}>{member.status}</span>
+                          </div>
+                          <div className={styles.memberDetails}>
+                            <p><strong>Email:</strong> {member.email}</p>
+                            <p><strong>Phone:</strong> {member.phone}</p>
+                            <p><strong>Membership:</strong> {member.membershipType}</p>
+                            <p><strong>Join Date:</strong> {new Date(member.joinDate).toLocaleDateString()}</p>
+                          </div>
+                          <div className={styles.cardActions}>
+                            <button className={styles.editButton}>Edit</button>
+                            <button className={styles.deleteButton}>Remove</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.noData}>No members found. Add members to get started.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div className={styles.settingsSection}>
+                <div className={styles.sectionHeader}>
+                  <h2>Gym Settings</h2>
+                </div>
+                <form className={styles.settingsForm} onSubmit={handleUpdateGym}>
+                  <div className={styles.formGroup}>
+                    <label>Gym Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={gymData.name}
+                      onChange={(e) => setGymData({ ...gymData, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Description</label>
+                    <textarea
+                      name="description"
+                      value={gymData.description}
+                      onChange={(e) => setGymData({ ...gymData, description: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="contact.email"
+                      value={gymData.contact.email}
+                      onChange={(e) => setGymData({
+                        ...gymData,
+                        contact: { ...gymData.contact, email: e.target.value }
+                      })}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      name="contact.phone"
+                      value={gymData.contact.phone}
+                      onChange={(e) => setGymData({
+                        ...gymData,
+                        contact: { ...gymData.contact, phone: e.target.value }
+                      })}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Address</label>
+                    <input
+                      type="text"
+                      name="address.street"
+                      placeholder="Street Address"
+                      value={gymData.address.street}
+                      onChange={(e) => setGymData({
+                        ...gymData,
+                        address: { ...gymData.address, street: e.target.value }
+                      })}
+                      required
+                    />
+                    <div className={styles.addressGrid}>
+                      <input
+                        type="text"
+                        name="address.city"
+                        placeholder="City"
+                        value={gymData.address.city}
+                        onChange={(e) => setGymData({
+                          ...gymData,
+                          address: { ...gymData.address, city: e.target.value }
+                        })}
+                        required
+                      />
+                      <input
+                        type="text"
+                        name="address.state"
+                        placeholder="State"
+                        value={gymData.address.state}
+                        onChange={(e) => setGymData({
+                          ...gymData,
+                          address: { ...gymData.address, state: e.target.value }
+                        })}
+                        required
+                      />
+                      <input
+                        type="text"
+                        name="address.zipCode"
+                        placeholder="ZIP Code"
+                        value={gymData.address.zipCode}
+                        onChange={(e) => setGymData({
+                          ...gymData,
+                          address: { ...gymData.address, zipCode: e.target.value }
+                        })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className={styles.formActions}>
+                    <button type="submit" className={styles.submitButton}>
+                      Save Changes
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                </form>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className={styles.noGym}>
+            <p>No gym found. Please create one to get started.</p>
+            <button onClick={() => navigate('/create-gym')} className={styles.createButton}>
+              Create Gym
+            </button>
           </div>
         )}
+      </div>
 
-        {activeTab === 'settings' && (
-          <div className={styles.settings}>
-            <h2>Gym Settings</h2>
-            <form className={styles.settingsForm} onSubmit={handleUpdateGym}>
+      {showClassForm && (
+        <div className={styles.formOverlay}>
+          <div className={styles.formContainer}>
+            <h2>{classFormData._id ? 'Edit Class' : 'Add New Class'}</h2>
+            <form onSubmit={handleCreateClass} className={styles.classForm}>
               <div className={styles.formGroup}>
-                <label>Gym Name</label>
+                <label>Class Name</label>
                 <input
                   type="text"
-                  value={gymData?.name || ''}
-                  onChange={(e) => setGymData(prev => ({ ...prev, name: e.target.value }))}
+                  name="name"
+                  value={classFormData.name}
+                  onChange={handleClassFormChange}
                   required
                 />
               </div>
+
               <div className={styles.formGroup}>
-                <label>Contact Email</label>
+                <label>Instructor Name</label>
                 <input
-                  type="email"
-                  value={gymData?.contact?.email || ''}
-                  onChange={(e) => setGymData(prev => ({
-                    ...prev,
-                    contact: { ...prev.contact, email: e.target.value }
-                  }))}
+                  type="text"
+                  name="instructor"
+                  value={classFormData.instructor}
+                  onChange={handleClassFormChange}
                   required
                 />
               </div>
-              <div className={styles.formGroup}>
-                <label>Contact Phone</label>
-                <input
-                  type="tel"
-                  value={gymData?.contact?.phone || ''}
-                  onChange={(e) => setGymData(prev => ({
-                    ...prev,
-                    contact: { ...prev.contact, phone: e.target.value }
-                  }))}
-                  required
-                />
-              </div>
+
               <div className={styles.formGroup}>
                 <label>Description</label>
                 <textarea
-                  value={gymData?.description || ''}
-                  onChange={(e) => setGymData(prev => ({ ...prev, description: e.target.value }))}
+                  name="description"
+                  value={classFormData.description}
+                  onChange={handleClassFormChange}
                   required
                 />
               </div>
-              <button type="submit" className={styles.saveButton}>
-                Save Changes
-              </button>
+
+              <div className={styles.formGroup}>
+                <label>Type</label>
+                <select
+                  name="type"
+                  value={classFormData.type}
+                  onChange={handleClassFormChange}
+                  required
+                >
+                  {CLASS_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Level</label>
+                <select
+                  name="level"
+                  value={classFormData.level}
+                  onChange={handleClassFormChange}
+                  required
+                >
+                  {CLASS_LEVELS.map(level => (
+                    <option key={level} value={level}>
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Day of Week</label>
+                <select
+                  name="schedule.dayOfWeek"
+                  value={classFormData.schedule.dayOfWeek}
+                  onChange={handleClassFormChange}
+                  required
+                >
+                  {DAYS_OF_WEEK.map(day => (
+                    <option key={day} value={day}>
+                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.timeGroup}>
+                <div className={styles.formGroup}>
+                  <label>Start Time</label>
+                  <input
+                    type="time"
+                    name="schedule.startTime"
+                    value={classFormData.schedule.startTime}
+                    onChange={handleClassFormChange}
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>End Time</label>
+                  <input
+                    type="time"
+                    name="schedule.endTime"
+                    value={classFormData.schedule.endTime}
+                    onChange={handleClassFormChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Capacity</label>
+                <input
+                  type="number"
+                  name="capacity"
+                  min="1"
+                  value={classFormData.capacity}
+                  onChange={handleClassFormChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formActions}>
+                <button type="submit" className={styles.submitButton}>
+                  {classFormData._id ? 'Update Class' : 'Create Class'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowClassForm(false);
+                    setClassFormData({
+                      name: '',
+                      instructor: '',
+                      description: '',
+                      type: 'Yoga',
+                      schedule: {
+                        dayOfWeek: 'monday',
+                        startTime: '09:00',
+                        endTime: '10:00'
+                      },
+                      capacity: 20,
+                      level: 'beginner'
+                    });
+                  }}
+                  className={styles.cancelButton}
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 }

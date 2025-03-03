@@ -1,4 +1,4 @@
-const router = require('express').Router();
+/* const router = require('express').Router();
 const Gym = require('../models/Gym');
 const Class = require('../models/Class');
 const auth = require('../middleware/auth');
@@ -114,3 +114,4 @@ router.delete('/:gymId/classes/:classId', auth, adminAuth, async (req, res) => {
 });
 
 module.exports = router;
+ */

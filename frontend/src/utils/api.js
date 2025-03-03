@@ -155,6 +155,20 @@ export const updateUserProfile = async (userId, userData, token) => {
   }
 };
 
+// User Management APIs
+export const getInstructors = async () => {
+  console.log('Fetching instructors');
+  try {
+    const response = await fetch(`${API_URL}/users/instructors`, {
+      headers: getAuthHeader(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Get instructors error:', error);
+    throw error;
+  }
+};
+
 // Gym Management APIs
 export const createGym = async (gymData) => {
   try {

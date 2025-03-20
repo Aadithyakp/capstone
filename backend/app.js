@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const gymRoutes = require('./routes/gyms');
 const classRoutes = require('./routes/classes');
 const membershipRoutes = require('./routes/memberships');
+const userRoutes = require('./routes/users');
 
 dotenv.config();
 
@@ -22,9 +23,10 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/gym', gymRoutes);
+app.use('/api/gyms', gymRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/memberships', membershipRoutes);
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

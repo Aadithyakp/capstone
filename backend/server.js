@@ -8,6 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Special middleware for Stripe webhook
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
 // MongoDB connection options
 const mongoOptions = {
   useNewUrlParser: true,
@@ -27,6 +30,7 @@ const userRoutes = require('./routes/users');
 const gymRoutes = require('./routes/gyms');
 const membershipRoutes = require('./routes/memberships');
 const reservationRoutes = require('./routes/reservations');
+const paymentRoutes = require('./routes/payment');
 
 // Use routes
 app.get('/', (req, res) => {
@@ -38,6 +42,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/gyms', gymRoutes); // Classes are now handled within gym routes
 app.use('/api/memberships', membershipRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/payment', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

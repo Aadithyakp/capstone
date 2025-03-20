@@ -19,18 +19,19 @@ router.post('/register', verifyCaptcha, async (req, res) => {
             });
         }
 
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
         // Create new user
         const user = new User({
             username,
             email,
+            password: hashedPassword,
             full_name,
             profile_picture,
-            role: role || 'member' // Default to member if no role specified
+            role: role || 'user' // Default to user if no role specified
         });
-
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
 
         // Save user
         await user.save();
@@ -56,7 +57,8 @@ router.post('/register', verifyCaptcha, async (req, res) => {
                 email: user.email,
                 full_name: user.full_name,
                 profile_picture: user.profile_picture,
-                role: user.role
+                role: user.role,
+                status: user.status
             }
         });
     } catch (error) {
@@ -103,12 +105,13 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 full_name: user.full_name,
                 profile_picture: user.profile_picture,
-                role: user.role
+                role: user.role,
+                status: user.status
             }
         });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -119,7 +122,7 @@ router.get('/me', auth, async (req, res) => {
         res.json(user);
     } catch (error) {
         console.error('Get user error:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: error.message });
     }
 });
 

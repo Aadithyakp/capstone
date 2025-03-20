@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGymByOwner, getGymClasses, createClass, updateClass, deleteClass, updateGym, createGym, logout, getInstructors } from '../../utils/api';
+import { getGymByOwner, getGymClasses, createClass, updateClass, deleteClass, updateGym, createGym, logout, getInstructors, getUserProfile } from '../../utils/api';
 import styles from './GymOwnerDashboard.module.css';
+import defaultAvatar from '../../assets/images/default-avatar.png';
 
 const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const CLASS_TYPES = ['Yoga', 'HIIT', 'Strength', 'Cardio', 'Pilates', 'Other'];
@@ -56,10 +57,12 @@ export default function GymOwnerDashboard() {
   });
 
   const [instructors, setInstructors] = useState([]);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     fetchData();
     fetchInstructors();
+    fetchUserProfile();
   }, []);
 
   const fetchData = async () => {
@@ -91,6 +94,15 @@ export default function GymOwnerDashboard() {
     } catch (error) {
       console.error('Error fetching instructors:', error);
       // Don't set error state as this is not critical
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const data = await getUserProfile();
+      setUserData(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
     }
   };
 
@@ -355,6 +367,26 @@ export default function GymOwnerDashboard() {
           <h1>Gym Owner Dashboard</h1>
         </div>
         <div className={styles.headerRight}>
+          <div className={styles.userInfo}>
+            <div className={styles.profileImageContainer}>
+              <img 
+                src={userData?.profile_picture || defaultAvatar} 
+                alt={userData?.full_name || 'User'} 
+                className={styles.profileImage}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = defaultAvatar;
+                }}
+              />
+            </div>
+            <div className={styles.userInfoText}>
+              <span>Welcome, {userData?.full_name || 'Gym Owner'}!</span>
+              <span className={styles.role}>Gym Owner</span>
+            </div>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              Logout
+            </button>
+          </div>
           <nav className={styles.navigation}>
             <button 
               className={`${styles.navButton} ${activeTab === 'overview' ? styles.active : ''}`}
@@ -381,9 +413,6 @@ export default function GymOwnerDashboard() {
               Settings
             </button>
           </nav>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            Logout
-          </button>
         </div>
       </header>
 

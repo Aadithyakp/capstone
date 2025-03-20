@@ -1,50 +1,31 @@
 const API_URL = 'http://localhost:5000/api';
 
-// Enhanced response handler with better error handling and logging
-const handleResponse = async (response) => {
-  console.log('Raw response:', {
-    status: response.status,
-    statusText: response.statusText,
-    headers: Object.fromEntries(response.headers)
-  });
-
-  let data;
+// Optimized response handler with minimal logging
+const handleResponse = async (response) => { 
   try {
-    const textResponse = await response.text();
-    console.log('Raw response text:', textResponse);
+    const data = await response.json();
     
-    try {
-      data = JSON.parse(textResponse);
-    } catch (e) {
-      console.error('JSON parsing error:', e);
-      throw new Error(`Invalid JSON response: ${textResponse.substring(0, 100)}...`);
-    }
-  } catch (error) {
-    console.error('Response parsing error:', error);
-    throw new Error('Failed to parse server response');
-  }
-
-  console.log('Parsed response data:', data);
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      // Clear token on authentication failure
-      localStorage.removeItem('token');
-      throw new Error('Unauthorized - Please log in again');
-    }
-    if (response.status === 403) {
-      throw new Error('Forbidden - You do not have permission to access this resource');
-    }
-    if (response.status === 404) {
-      if (data.message?.includes('gym')) {
-        throw new Error('No gym found');
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Unauthorized - Please log in again');
       }
-      throw new Error('Not found');
+      if (response.status === 403) {
+        throw new Error('Forbidden - You do not have permission');
+      }
+      if (response.status === 404) {
+        throw new Error(data.message || 'Resource not found');
+      }
+      throw new Error(data.message || `Server error: ${response.status}`);
     }
-    throw new Error(data.message || `Server error: ${response.status}`);
-  }
 
-  return data;
+    return data;
+  } catch (error) {
+    if (error.name === 'SyntaxError') {
+      throw new Error('Invalid server response');
+    }
+    throw error;
+  }
 };
 
 const getAuthHeader = () => {
@@ -60,7 +41,6 @@ const getAuthHeader = () => {
 
 // Auth APIs
 export const register = async (userData) => {
-  console.log('Registering user:', userData);
   try {
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
@@ -77,7 +57,6 @@ export const register = async (userData) => {
 };
 
 export const login = async (credentials) => {
-  console.log('Logging in user:', credentials);
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -97,33 +76,23 @@ export const login = async (credentials) => {
   }
 };
 
-export const getUserProfile = async (userId, token) => {
-  if (!userId) {
-    throw new Error('User ID is required');
-  }
-  
-  console.log('Fetching user profile:', { 
-    userId, 
-    hasToken: !!token,
-    url: `${API_URL}/users/${userId}`
-  });
-
+export const getUserProfile = async () => {
   try {
-    const headers = getAuthHeader(token);
-    console.log('Request headers:', headers);
-
-    const response = await fetch(`${API_URL}/users/${userId}`, {
+    const response = await fetch(`${API_URL}/users/profile`, {
       method: 'GET',
-      headers: headers
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
     });
 
-    return handleResponse(response);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error('Get profile error:', {
-      message: error.message,
-      status: error.status,
-      stack: error.stack
-    });
+    console.error('Get profile error:', error);
     throw error;
   }
 };
@@ -273,6 +242,86 @@ export const deleteClass = async (gymId, classId) => {
   }
 };
 
+// Member Dashboard API Functions
+export const searchGyms = async (query) => {
+  try {
+    const response = await fetch(`${API_URL}/gyms/search?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to search gyms');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error searching gyms:', error);
+    throw error;
+  }
+};
+
+export const enrollInClass = async (gymId, classId) => {
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/classes/${classId}/enroll`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to enroll in class');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error enrolling in class:', error);
+    throw error;
+  }
+};
+
+export const cancelEnrollment = async (gymId, classId) => {
+  console.log('Canceling class enrollment:', { gymId, classId });
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/classes/${classId}/cancel`, {
+      method: 'POST',
+      headers: getAuthHeader(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Cancel enrollment error:', error);
+    throw error;
+  }
+};
+
+export const getAllGyms = async () => {
+  try {
+    const response = await fetch(`${API_URL}/gyms`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch gyms');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching gyms:', error);
+    throw error;
+  }
+};
+
 // Utility functions
 export const checkAuthStatus = async () => {
   try {
@@ -295,4 +344,26 @@ export const checkAuthStatus = async () => {
 export const logout = () => {
   localStorage.removeItem('token');
   window.location.href = '/';
+};
+
+export const updateUserStatus = async (status, plan) => {
+  try {
+    const response = await fetch(`${API_URL}/users/status`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status, plan })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user status');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    throw error;
+  }
 };

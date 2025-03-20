@@ -7,6 +7,7 @@ import RegisterPage from './components/Register';
 import Dashboard from './components/Dashboard';
 import GymOwnerDashboard from './components/gym-owner/GymOwnerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import Payment from './components/Payment';
 import './App.css';
 
 const theme = createTheme({
@@ -74,6 +75,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <GymOwnerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment"
+            element={
+              <ProtectedRoute>
+                <Payment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-success"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/dashboard" replace />
               </ProtectedRoute>
             }
           />

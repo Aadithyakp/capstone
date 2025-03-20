@@ -106,10 +106,23 @@ router.post('/:gymId/classes', auth, adminAuth, async (req, res) => {
 });
 
 // Get all classes for a gym
-router.get('/:gymId/classes', async (req, res) => {
+router.get('/:gymId/classes', auth, async (req, res) => {
   try {
     const classes = await Class.find({ gym: req.params.gymId });
-    res.json(classes);
+    
+    // Add enrollment status for each class
+    const classesWithEnrollmentStatus = classes.map(classItem => {
+      const isEnrolled = classItem.enrolledMembers.some(memberId => 
+        memberId.equals(req.user._id)
+      );
+      return {
+        ...classItem.toObject(),
+        isEnrolled,
+        currentCapacity: classItem.enrolledMembers.length
+      };
+    });
+    
+    res.json(classesWithEnrollmentStatus);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -153,6 +166,82 @@ router.delete('/:gymId/classes/:classId', auth, adminAuth, async (req, res) => {
       return res.status(404).json({ message: 'Class not found' });
     }
     res.json({ message: 'Class deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Enroll in a class
+router.post('/:gymId/classes/:classId/enroll', auth, async (req, res) => {
+  try {
+    const classItem = await Class.findOne({
+      _id: req.params.classId,
+      gym: req.params.gymId
+    });
+
+    if (!classItem) {
+      return res.status(404).json({ message: 'Class not found' });
+    }
+
+    // Check if user is already enrolled
+    const userId = req.user._id;
+    if (classItem.enrolledMembers.some(memberId => memberId.equals(userId))) {
+      return res.status(400).json({ message: 'Already enrolled in this class' });
+    }
+
+    // Check if class is full
+    if (classItem.enrolledMembers.length >= classItem.capacity) {
+      return res.status(400).json({ message: 'Class is full' });
+    }
+
+    // Check if class is active
+    if (classItem.status !== 'active') {
+      return res.status(400).json({ message: 'Class is not available for enrollment' });
+    }
+
+    // Add user to enrolled members
+    classItem.enrolledMembers.push(userId);
+    await classItem.save();
+
+    res.json({ 
+      message: 'Successfully enrolled in class',
+      enrollmentStatus: 'enrolled'
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Cancel class enrollment
+router.post('/:gymId/classes/:classId/cancel', auth, async (req, res) => {
+  try {
+    const classItem = await Class.findOne({
+      _id: req.params.classId,
+      gym: req.params.gymId
+    });
+
+    if (!classItem) {
+      return res.status(404).json({ message: 'Class not found' });
+    }
+
+    // Check if user is enrolled
+    const userId = req.user._id;
+    const enrolledIndex = classItem.enrolledMembers.findIndex(memberId => 
+      memberId.equals(userId)
+    );
+
+    if (enrolledIndex === -1) {
+      return res.status(400).json({ message: 'Not enrolled in this class' });
+    }
+
+    // Remove user from enrolled members
+    classItem.enrolledMembers.splice(enrolledIndex, 1);
+    await classItem.save();
+
+    res.json({ 
+      message: 'Successfully cancelled enrollment',
+      enrollmentStatus: ''
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,0 +1,188 @@
+.paymentContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #000000;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.paymentPlans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.paymentPlan {
+  background: #ffffff;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.paymentPlan:hover {
+  border-color: #000000;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.selectedPlan {
+  border-color: #000000;
+  background: #ffffff;
+}
+
+.paymentPlan h3 {
+  color: #000000;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.planPrice {
+  font-size: 3rem;
+  color: #000000;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.planPrice::before {
+  content: '$';
+  font-size: 1.5rem;
+  vertical-align: top;
+  margin-right: 0.25rem;
+}
+
+.planPrice::after {
+  content: '/month';
+  font-size: 1rem;
+  color: #666666;
+  margin-left: 0.25rem;
+}
+
+.paymentPlan ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  text-align: left;
+}
+
+.paymentPlan li {
+  color: #444444;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+}
+
+.paymentPlan li:last-child {
+  border-bottom: none;
+}
+
+.paymentPlan li::before {
+  content: '✓';
+  margin-right: 0.75rem;
+  color: #000000;
+  font-weight: bold;
+}
+
+.planSelectButton {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #000000;
+  background: #000000;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.planSelectButton:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.selectedPlan .planSelectButton {
+  background: #ffffff;
+  color: #000000;
+}
+
+.paymentButton {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto;
+  padding: 1.25rem;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paymentButton:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.paymentButton:disabled {
+  background: #cccccc;
+  border-color: #cccccc;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.paymentStatus {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.processing {
+  background-color: #f5f5f5;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.success {
+  background-color: #f5f5f5;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.failed {
+  background-color: #f5f5f5;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.paymentError {
+  background-color: #f5f5f5;
+  color: #000000;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+  border: 1px solid #000000;
+}

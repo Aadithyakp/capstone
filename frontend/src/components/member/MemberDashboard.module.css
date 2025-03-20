@@ -1,0 +1,458 @@
+/* Dashboard Layout */
+.dashboard {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+.header {
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.headerLeft h1 {
+  font-size: 1.75rem;
+  color: #2d3748;
+  margin: 0;
+  font-weight: 600;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.profileImageContainer {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #000000;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userInfoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfoText span:first-child {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.membershipStatus {
+  font-size: 0.875rem;
+  color: #444444;
+  font-weight: 500;
+}
+
+.logoutButton {
+  padding: 0.5rem 1rem;
+  background: #e53e3e;
+  color: white;
+  border: 2px solid #000000;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.logoutButton:hover {
+  background: #c53030;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.searchSection {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  position: sticky;
+  top: 2rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.gymResults {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.gymCard {
+  background: white;
+  border: 2px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gymCard:hover, .gymCard.selected {
+  border-color: #4299e1;
+  box-shadow: 0 2px 4px rgba(66, 153, 225, 0.1);
+}
+
+.gymCard.selected {
+  background: #ebf8ff;
+}
+
+.gymHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.gymHeader h2 {
+  font-size: 1.125rem;
+  color: #2d3748;
+  margin: 0;
+}
+
+.gymRating {
+  color: #f6ad55;
+  font-weight: 500;
+}
+
+.gymDetails {
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.gymAddress {
+  margin: 0.5rem 0;
+  color: #718096;
+}
+
+.gymContact {
+  display: flex;
+  gap: 1rem;
+  color: #718096;
+  font-size: 0.75rem;
+}
+
+.classesSection {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  border: 2px solid #e5e5e5;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.enrollmentError {
+  background-color: #fff5f5;
+  border: 1px solid #fc8181;
+  color: #c53030;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.classGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.classCard {
+  background: white;
+  border: 2px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.classCard:hover {
+  border-color: #4299e1;
+  box-shadow: 0 2px 4px rgba(66, 153, 225, 0.1);
+}
+
+.classHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.classHeader h3 {
+  font-size: 1.125rem;
+  color: #2d3748;
+  margin: 0;
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.classType {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  background: #e6fffa;
+  color: #319795;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.classInfo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #718096;
+  align-items: center;
+}
+
+.classInfo strong {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.classInfo span {
+  color: #718096;
+}
+
+.enrollButton, .cancelButton {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: auto;
+}
+
+.enrollButton {
+  background: #48bb78;
+  color: white;
+}
+
+.enrollButton:hover:not(:disabled) {
+  background: #38a169;
+}
+
+.enrollButton:disabled {
+  background: #e2e8f0;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+.cancelButton:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Status variations */
+.enrollButton[data-status='enrolled'] {
+  background: #4299e1;
+  color: white;
+  cursor: default;
+}
+
+.enrollButton[data-status='full'] {
+  background: #fc8181;
+  color: white;
+}
+
+.enrollButton[data-status='unavailable'] {
+  background: #a0aec0;
+  color: white;
+}
+
+.error {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #fff5f5;
+  border-radius: 6px;
+  border: 1px solid #feb2b2;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.125rem;
+  color: #4a5568;
+}
+
+.noResults, .noClasses {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+.subscriptionExpired {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 2rem;
+  text-align: center;
+}
+
+.subscriptionExpired h2 {
+  color: #000000;
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  font-weight: normal;
+}
+
+.subscriptionExpired p {
+  color: #444444;
+  font-size: 1rem;
+  margin: 0 0 1.5rem 0;
+  max-width: 400px;
+  line-height: 1.4;
+}
+
+.renewButton {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  min-width: 120px;
+  transition: all 0.2s;
+}
+
+.renewButton:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+@media (max-width: 1280px) {
+  .classGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .classGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .searchSection, .classesSection {
+    height: auto;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .classGrid {
+    grid-template-columns: 1fr;
+  }
+}

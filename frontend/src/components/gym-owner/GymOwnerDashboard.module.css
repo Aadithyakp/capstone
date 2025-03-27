@@ -249,7 +249,20 @@
 
 /* Members Section */
 .membersSection {
-  background: #ffffff;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.membersSection h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #000;
+}
+
+.membersList {
+  background: white;
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -259,57 +272,189 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-top: 1.5rem;
 }
 
 .memberCard {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   padding: 1.5rem;
+  cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .memberCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #000;
 }
 
-.memberHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.memberCard.selected {
+  border: 2px solid #000;
+  background-color: #fafafa;
 }
 
-.memberHeader h3 {
-  font-size: 1.125rem;
-  color: #1a1a1a;
+.memberAvatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.memberAvatar img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f3f4f6;
+}
+
+.statusDot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #f3f4f6;
+}
+
+.statusDot.active {
+  background-color: #22c55e;
+}
+
+.statusDot.inactive {
+  background-color: #94a3b8;
+}
+
+.memberInfo {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.memberInfo h3 {
   margin: 0;
+  font-size: 1rem;
   font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.membershipStatus {
-  background-color: #f5f5f5;
-  color: #1a1a1a;
+.memberStatus {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.memberPlan {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.memberPlan.free {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.memberPlan.premium {
+  background-color: #000;
+  color: white;
 }
 
 .memberDetails {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 2rem;
+}
+
+.memberDetails h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 2rem;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
   font-size: 0.875rem;
-}
-
-.memberDetails p {
-  margin: 0.5rem 0;
-  color: #4a4a4a;
-}
-
-.memberDetails strong {
-  color: #1a1a1a;
+  color: #6b7280;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detailItem span:not(.label) {
+  font-size: 1rem;
+  color: #000;
+  font-weight: 500;
+}
+
+.enrolledClasses {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 2rem;
+}
+
+.enrolledClasses h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 1.5rem;
+}
+
+.classList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.classItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.className {
+  font-weight: 500;
+  color: #000;
+}
+
+.classSchedule {
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
 /* Settings Section */
@@ -405,6 +550,45 @@
 .deleteButton:hover {
   background-color: #dc2626;
   color: #ffffff;
+}
+
+/* Status Toggle Button */
+.statusToggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusToggle span {
+  text-transform: capitalize;
+}
+
+.toggleButton {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #000;
+}
+
+.toggleButton.active {
+  background-color: #000;
+  color: white;
+}
+
+.toggleButton.active:hover {
+  background-color: #1a1a1a;
+}
+
+.toggleButton.inactive {
+  background-color: white;
+  color: #000;
+}
+
+.toggleButton.inactive:hover {
+  background-color: #f3f4f6;
 }
 
 /* Form Overlay */
@@ -729,4 +913,72 @@
   padding: 3rem 0;
   color: #666666;
   font-size: 0.875rem;
+}
+
+.membersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.searchBox {
+  flex: 1;
+  max-width: 300px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.totalMembers {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  color: #000;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  border-color: #000;
+  background: #f9fafb;
+}
+
+.pageButton.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

@@ -8,6 +8,8 @@ import Dashboard from './components/Dashboard';
 import GymOwnerDashboard from './components/gym-owner/GymOwnerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Payment from './components/Payment';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import ContactUs from './components/ContactUs';
 import './App.css';
 
 const theme = createTheme({
@@ -60,6 +62,8 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<Homepage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/contact-us" element={<ContactUs />} />
           
           {/* Protected routes */}
           <Route

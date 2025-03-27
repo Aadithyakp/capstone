@@ -322,6 +322,34 @@ export const getAllGyms = async () => {
   }
 };
 
+// Get gym members
+export const getGymMembers = async (gymId) => {
+  console.log('Fetching gym members:', gymId);
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/members`, {
+      headers: getAuthHeader(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Get gym members error:', error);
+    throw error;
+  }
+};
+
+// Get member details
+export const getMemberDetails = async (gymId, memberId) => {
+  console.log('Fetching member details:', { gymId, memberId });
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/members/${memberId}`, {
+      headers: getAuthHeader(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Get member details error:', error);
+    throw error;
+  }
+};
+
 // Utility functions
 export const checkAuthStatus = async () => {
   try {
@@ -364,6 +392,28 @@ export const updateUserStatus = async (status, plan) => {
     return await response.json();
   } catch (error) {
     console.error('Error updating user status:', error);
+    throw error;
+  }
+};
+
+export const updateMemberStatus = async (gymId, memberId, status) => {
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/members/${memberId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update member status');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating member status:', error);
     throw error;
   }
 };

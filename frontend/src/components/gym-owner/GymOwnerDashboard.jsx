@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGymByOwner, getGymClasses, createClass, updateClass, deleteClass, updateGym, createGym, logout, getInstructors, getUserProfile } from '../../utils/api';
+import { getGymByOwner, getGymClasses, createClass, deleteClass, updateGym, createGym, logout, getUserProfile, getGymMembers, getMemberDetails, updateMemberStatus } from '../../utils/api';
 import styles from './GymOwnerDashboard.module.css';
 import defaultAvatar from '../../assets/images/default-avatar.png';
 
@@ -13,10 +13,13 @@ export default function GymOwnerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [gymData, setGymData] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showClassForm, setShowClassForm] = useState(false);
   const [showGymForm, setShowGymForm] = useState(false);
+  const [userData, setUserData] = useState(null);
   const [gymFormData, setGymFormData] = useState({
     name: '',
     description: '',
@@ -41,7 +44,6 @@ export default function GymOwnerDashboard() {
       sunday: { open: '08:00', close: '20:00' }
     }
   });
-
   const [classFormData, setClassFormData] = useState({
     name: '',
     instructor: '', 
@@ -56,16 +58,11 @@ export default function GymOwnerDashboard() {
     level: 'beginner'
   });
 
-  const [instructors, setInstructors] = useState([]);
-  const [userData, setUserData] = useState(null);
+  const [membersPerPage] = useState(8);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    fetchData();
-    fetchInstructors();
-    fetchUserProfile();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const gymResponse = await getGymByOwner();
@@ -85,24 +82,47 @@ export default function GymOwnerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchInstructors = async () => {
+  const fetchMembers = useCallback(async () => {
+    if (!gymData?._id) return;
+    
     try {
-      const data = await getInstructors();
-      setInstructors(data);
-    } catch (error) {
-      console.error('Error fetching instructors:', error);
-      // Don't set error state as this is not critical
+      const membersData = await getGymMembers(gymData._id);
+      setMembers(membersData);
+    } catch (err) {
+      console.error('Error fetching members:', err);
+      setError('Failed to load members data');
     }
-  };
+  }, [gymData?._id]);
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       const data = await getUserProfile();
       setUserData(data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+    fetchUserProfile();
+  }, [fetchData, fetchUserProfile]);
+
+  useEffect(() => {
+    if (gymData?._id) {
+      fetchMembers();
+    }
+  }, [gymData, fetchMembers]);
+
+  const handleMemberClick = async (memberId) => {
+    try {
+      const memberDetails = await getMemberDetails(gymData._id, memberId);
+      setSelectedMember(memberDetails);
+    } catch (err) {
+      console.error('Error fetching member details:', err);
+      setError('Failed to load member details');
     }
   };
 
@@ -241,6 +261,180 @@ export default function GymOwnerDashboard() {
     navigate('/login');
   };
 
+  const handleStatusToggle = async (memberId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      await updateMemberStatus(gymData._id, memberId, newStatus);
+      
+      // Update local state
+      setMembers(members.map(member => 
+        member._id === memberId ? { ...member, status: newStatus } : member
+      ));
+      
+      if (selectedMember?._id === memberId) {
+        setSelectedMember({ ...selectedMember, status: newStatus });
+      }
+    } catch (error) {
+      console.error('Error updating member status:', error);
+      setError('Failed to update member status');
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Filter members based on search
+  const filteredMembers = members.filter(member => 
+    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Get current members for pagination
+  const indexOfLastMember = currentPage * membersPerPage;
+  const indexOfFirstMember = indexOfLastMember - membersPerPage;
+  const currentMembers = filteredMembers.slice(indexOfFirstMember, indexOfLastMember);
+  const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+
+  const renderMembersTab = () => {
+    return (
+      <div className={styles.membersSection}>
+        <h2>Members</h2>
+        
+        <div className={styles.membersList}>
+          {error && <div className={styles.error}>{error}</div>}
+          
+          <div className={styles.membersHeader}>
+            <div className={styles.searchBox}>
+              <input
+                type="text"
+                placeholder="Search members..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+            <div className={styles.totalMembers}>
+              Total Members: {filteredMembers.length}
+            </div>
+          </div>
+
+          {filteredMembers.length === 0 ? (
+            <p>No members found. {searchQuery ? 'Try a different search.' : 'Add members to get started.'}</p>
+          ) : (
+            <>
+              <div className={styles.membersGrid}>
+                {currentMembers.map((member) => (
+                  <div 
+                    key={member._id}
+                    className={`${styles.memberCard} ${selectedMember?._id === member._id ? styles.selected : ''}`}
+                    onClick={() => handleMemberClick(member._id)}
+                  >
+                    <div className={styles.memberAvatar}>
+                      <img src={member.profilePicture || defaultAvatar} alt={member.name} />
+                      <span className={`${styles.statusDot} ${styles[member.status]}`} />
+                    </div>
+                    <div className={styles.memberInfo}>
+                      <h3>{member.name}</h3>
+                      <p className={styles.memberStatus}>{member.status}</p>
+                    </div>
+                    <span className={`${styles.memberPlan} ${styles[member.plan?.toLowerCase() || 'free']}`}>
+                      {member.plan || 'Free'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className={styles.pagination}>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                  >
+                    Previous
+                  </button>
+                  
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`${styles.pageButton} ${currentPage === index + 1 ? styles.active : ''}`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+
+              {selectedMember && (
+                <div className={styles.memberDetails}>
+                  <h3>Member Details</h3>
+                  <div className={styles.detailsGrid}>
+                    <div className={styles.detailItem}>
+                      <span className={styles.label}>Name:</span>
+                      <span>{selectedMember.name}</span>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <span className={styles.label}>Email:</span>
+                      <span>{selectedMember.email}</span>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <span className={styles.label}>Plan:</span>
+                      <span>{selectedMember.plan || 'Free'}</span>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <span className={styles.label}>Status:</span>
+                      <div className={styles.statusToggle}>
+                        <span>{selectedMember.status}</span>
+                        <button
+                          className={`${styles.toggleButton} ${styles[selectedMember.status]}`}
+                          onClick={() => handleStatusToggle(selectedMember._id, selectedMember.status)}
+                        >
+                          {selectedMember.status === 'active' ? 'Set Inactive' : 'Set Active'}
+                        </button>
+                      </div>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <span className={styles.label}>Joined:</span>
+                      <span>{new Date(selectedMember.joinedDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.enrolledClasses}>
+                    <h4>Enrolled Classes</h4>
+                    {selectedMember.enrolledClasses?.length > 0 ? (
+                      <ul className={styles.classList}>
+                        {selectedMember.enrolledClasses.map((classItem) => (
+                          <li key={classItem._id} className={styles.classItem}>
+                            <span className={styles.className}>{classItem.name}</span>
+                            <span className={styles.classSchedule}>
+                              {classItem.schedule.dayOfWeek} {classItem.schedule.startTime}-{classItem.schedule.endTime}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>Not enrolled in any classes</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
   }
@@ -367,26 +561,7 @@ export default function GymOwnerDashboard() {
           <h1>Gym Owner Dashboard</h1>
         </div>
         <div className={styles.headerRight}>
-          <div className={styles.userInfo}>
-            <div className={styles.profileImageContainer}>
-              <img 
-                src={userData?.profile_picture || defaultAvatar} 
-                alt={userData?.full_name || 'User'} 
-                className={styles.profileImage}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = defaultAvatar;
-                }}
-              />
-            </div>
-            <div className={styles.userInfoText}>
-              <span>Welcome, {userData?.full_name || 'Gym Owner'}!</span>
-              <span className={styles.role}>Gym Owner</span>
-            </div>
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
+          
           <nav className={styles.navigation}>
             <button 
               className={`${styles.navButton} ${activeTab === 'overview' ? styles.active : ''}`}
@@ -413,6 +588,26 @@ export default function GymOwnerDashboard() {
               Settings
             </button>
           </nav>
+          <div className={styles.userInfo}>
+            <div className={styles.profileImageContainer}>
+              <img 
+                src={userData?.profile_picture || defaultAvatar} 
+                alt={userData?.full_name || 'User'} 
+                className={styles.profileImage}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = defaultAvatar;
+                }}
+              />
+            </div>
+            <div className={styles.userInfoText}>
+              <span>Welcome, {userData?.full_name || 'Gym Owner'}!</span>
+              <span className={styles.role}>Gym Owner</span>
+            </div>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
@@ -572,42 +767,7 @@ export default function GymOwnerDashboard() {
               </div>
             )}
 
-            {activeTab === 'members' && (
-              <div className={styles.membersSection}>
-                <div className={styles.sectionHeader}>
-                  <h2>Members</h2>
-                  <button className={styles.addButton}>
-                    Add Member
-                  </button>
-                </div>
-                <div className={styles.membersList}>
-                  {gymData.members && gymData.members.length > 0 ? (
-                    <div className={styles.membersGrid}>
-                      {gymData.members.map(member => (
-                        <div key={member._id} className={styles.memberCard}>
-                          <div className={styles.memberHeader}>
-                            <h3>{member.name}</h3>
-                            <span className={styles.membershipStatus}>{member.status}</span>
-                          </div>
-                          <div className={styles.memberDetails}>
-                            <p><strong>Email:</strong> {member.email}</p>
-                            <p><strong>Phone:</strong> {member.phone}</p>
-                            <p><strong>Membership:</strong> {member.membershipType}</p>
-                            <p><strong>Join Date:</strong> {new Date(member.joinDate).toLocaleDateString()}</p>
-                          </div>
-                          <div className={styles.cardActions}>
-                            <button className={styles.editButton}>Edit</button>
-                            <button className={styles.deleteButton}>Remove</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.noData}>No members found. Add members to get started.</p>
-                  )}
-                </div>
-              </div>
-            )}
+            {activeTab === 'members' && renderMembersTab()}
 
             {activeTab === 'settings' && (
               <div className={styles.settingsSection}>

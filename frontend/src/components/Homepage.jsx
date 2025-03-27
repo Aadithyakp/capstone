@@ -322,7 +322,7 @@ const Homepage = () => {
         <div className={styles.footerContent}>
           <div className={styles.footerBrand}>
             <Link to="/" className={styles.footerLogo}>
-              <FitnessCenter /> GymPal
+              GymPal
             </Link>
             <p className={styles.footerDescription}>
               Empowering gym owners with smart management solutions for a better fitness experience.
@@ -335,23 +335,13 @@ const Homepage = () => {
             </div>
           </div>
           
-          <div className={styles.footerColumn}>
-            <h3>Product</h3>
-            <div className={styles.footerLinks}>
-              <Link to="/features">Features</Link>
-              <Link to="/pricing">Pricing</Link>
-              <Link to="/demo">Demo</Link>
-              <Link to="/updates">Updates</Link>
-            </div>
-          </div>
           
+            
           <div className={styles.footerColumn}>
-            <h3>Company</h3>
+          <h3>Product</h3>
             <div className={styles.footerLinks}>
-              <Link to="/about">About Us</Link>
-              <Link to="/careers">Careers</Link>
-              <Link to="/blog">Blog</Link>
-              <Link to="/press">Press Kit</Link>
+            <Link to="/privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
+            <Link to="/contact-us" className={styles.footerLink}>Contact Us</Link>
             </div>
           </div>
           
@@ -376,16 +366,6 @@ const Homepage = () => {
         </div>
       </footer>
 
-      {/* Video Modal */}
-      {isVideoPlaying && (
-        <div className={styles.videoModal} onClick={() => setIsVideoPlaying(false)}>
-          <div className={styles.videoContainer}>
-            <video controls autoPlay>
-              <source src={appDemo} type="video/mp4" />
-            </video>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGymByOwner, getGymClasses, createClass, deleteClass, updateGym, createGym, logout, getUserProfile, getGymMembers, getMemberDetails, updateMemberStatus } from '../../utils/api';
+import { getGymByOwner, getGymClasses, createClass, deleteClass, updateGym, createGym, logout, getUserProfile, getGymMembers, getMemberDetails, updateMemberStatus, updateMemberPlan, changePassword } from '../../utils/api';
 import styles from './GymOwnerDashboard.module.css';
 import defaultAvatar from '../../assets/images/default-avatar.png';
 
@@ -61,6 +61,14 @@ export default function GymOwnerDashboard() {
   const [membersPerPage] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -280,8 +288,54 @@ export default function GymOwnerDashboard() {
     }
   };
 
+  const handlePlanChange = async (memberId, newPlan) => {
+    try {
+      await updateMemberPlan(gymData._id, memberId, newPlan);
+      const updatedMembers = members.map(member => 
+        member._id === memberId ? { ...member, plan: newPlan } : member
+      );
+      setMembers(updatedMembers);
+      if (selectedMember?._id === memberId) {
+        setSelectedMember(prev => ({ ...prev, plan: newPlan }));
+      }
+      // toast.success('Member plan updated successfully');
+    } catch (error) {
+      console.error('Error updating member plan:', error);
+      // toast.error('Failed to update member plan');
+    }
+  };
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    // Validate passwords
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError(`New passwords do not match`);
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError(`New password must be at least 6 characters long`);
+      return;
+    }
+
+    try {
+      await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+      setPasswordSuccess('Password changed successfully');
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    } catch (error) {
+      setPasswordError(error.message || 'Failed to change password');
+    }
   };
 
   // Filter members based on search
@@ -387,9 +441,18 @@ export default function GymOwnerDashboard() {
                       <span className={styles.label}>Email:</span>
                       <span>{selectedMember.email}</span>
                     </div>
-                    <div className={styles.detailItem}>
-                      <span className={styles.label}>Plan:</span>
-                      <span>{selectedMember.plan || 'Free'}</span>
+                    <div className={styles.detailRow}>
+                      <span className={styles.label}>PLAN:</span>
+                      <div className={styles.value}>
+                        <select
+                          value={selectedMember.plan}
+                          onChange={(e) => handlePlanChange(selectedMember._id, e.target.value)}
+                          className={styles.planSelect}
+                        >
+                          <option value="free">Free</option>
+                          <option value="premium">Premium</option>
+                        </select>
+                      </div>
                     </div>
                     <div className={styles.detailItem}>
                       <span className={styles.label}>Status:</span>
@@ -875,6 +938,83 @@ export default function GymOwnerDashboard() {
                     </button>
                   </div>
                 </form>
+
+                <div className={styles.passwordSection}>
+                  <div className={styles.passwordHeader}>
+                    <h3>Security Settings</h3>
+                  </div>
+                  <p className={styles.passwordDescription}>
+                    Protect your account by using a strong password that you don&apos;t use for other accounts.
+                    Your password must be at least 6 characters long.
+                  </p>
+                  <form onSubmit={handlePasswordChange} className={styles.passwordForm}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="currentPassword">Current Password</label>
+                      <input
+                        id="currentPassword"
+                        type="password"
+                        placeholder="Enter your current password"
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm(prev => ({
+                          ...prev,
+                          currentPassword: e.target.value
+                        }))}
+                        className={styles.input}
+                        required
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="newPassword">New Password</label>
+                      <input
+                        id="newPassword"
+                        type="password"
+                        placeholder="Enter your new password"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm(prev => ({
+                          ...prev,
+                          newPassword: e.target.value
+                        }))}
+                        className={styles.input}
+                        required
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="confirmPassword">Confirm New Password</label>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirm your new password"
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) => setPasswordForm(prev => ({
+                          ...prev,
+                          confirmPassword: e.target.value
+                        }))}
+                        className={styles.input}
+                        required
+                      />
+                    </div>
+                    {passwordError && (
+                      <div className={styles.error2}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        {passwordError}
+                      </div>
+                    )}
+                    {passwordSuccess && (
+                      <div className={styles.success}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                        {passwordSuccess}
+                      </div>
+                    )}
+                    <button type="submit" className={styles.passwordButton}>
+                      Update Password
+                    </button>
+                  </form>
+                </div>
               </div>
             )}
           </>

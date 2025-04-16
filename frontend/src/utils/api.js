@@ -1,5 +1,7 @@
 const API_URL = 'http://localhost:5000/api';
 
+const getToken = () => localStorage.getItem('token');
+
 // Optimized response handler with minimal logging
 const handleResponse = async (response) => { 
   try {
@@ -414,6 +416,70 @@ export const updateMemberStatus = async (gymId, memberId, status) => {
     return await response.json();
   } catch (error) {
     console.error('Error updating member status:', error);
+    throw error;
+  }
+};
+
+export const updateMemberPlan = async (gymId, memberId, plan) => {
+  try {
+    const response = await fetch(`${API_URL}/gyms/${gymId}/members/${memberId}/plan`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ plan })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update member plan');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating member plan:', error);
+    throw error;
+  }
+};
+
+export const updateMemberProfile = async (memberData) => {
+    const response = await fetch(`${API_URL}/users/update-profile`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(memberData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update profile');
+    }
+
+    return await response.json();
+};
+
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const response = await fetch(`${API_URL}/users/change-password`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to change password');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error changing password:', error);
     throw error;
   }
 };

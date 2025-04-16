@@ -110,10 +110,10 @@ router.post('/:gymId/classes', auth, adminAuth, async (req, res) => {
 router.get('/:gymId/classes', auth, async (req, res) => {
   try {
     const classes = await Class.find({ gym: req.params.gymId });
-   
+    
     // Add enrollment status for each class
     const classesWithEnrollmentStatus = classes.map(classItem => {
-      const isEnrolled = classItem.enrolledMembers.some(memberId =>
+      const isEnrolled = classItem.enrolledMembers.some(memberId => 
         memberId.equals(req.user._id)
       );
       return {
@@ -122,7 +122,7 @@ router.get('/:gymId/classes', auth, async (req, res) => {
         currentCapacity: classItem.enrolledMembers.length
       };
     });
-   
+    
     res.json(classesWithEnrollmentStatus);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -204,7 +204,7 @@ router.post('/:gymId/classes/:classId/enroll', auth, async (req, res) => {
     classItem.enrolledMembers.push(userId);
     await classItem.save();
 
-    res.json({
+    res.json({ 
       message: 'Successfully enrolled in class',
       enrollmentStatus: 'enrolled'
     });
@@ -227,7 +227,7 @@ router.post('/:gymId/classes/:classId/cancel', auth, async (req, res) => {
 
     // Check if user is enrolled
     const userId = req.user._id;
-    const enrolledIndex = classItem.enrolledMembers.findIndex(memberId =>
+    const enrolledIndex = classItem.enrolledMembers.findIndex(memberId => 
       memberId.equals(userId)
     );
 
@@ -239,7 +239,7 @@ router.post('/:gymId/classes/:classId/cancel', auth, async (req, res) => {
     classItem.enrolledMembers.splice(enrolledIndex, 1);
     await classItem.save();
 
-    res.json({
+    res.json({ 
       message: 'Successfully cancelled enrollment',
       enrollmentStatus: ''
     });
@@ -258,7 +258,7 @@ router.get('/:gymId/members', auth, adminAuth, async (req, res) => {
 
     // Find all classes in this gym
     const classes = await Class.find({ gym: req.params.gymId });
-   
+    
     // Get unique member IDs from all classes
     const memberIds = new Set();
     classes.forEach(classItem => {
@@ -368,6 +368,29 @@ router.patch('/:gymId/members/:memberId/status', auth, adminAuth, async (req, re
     res.json({ message: 'Member status updated successfully', member });
   } catch (error) {
     console.error('Error updating member status:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update member plan
+router.patch('/:gymId/members/:memberId/plan', auth, adminAuth, async (req, res) => {
+  try {
+    const { plan } = req.body;
+    
+    if (!['free', 'premium'].includes(plan)) {
+      return res.status(400).json({ message: 'Invalid plan type' });
+    }
+
+    const member = await User.findById(req.params.memberId);
+    if (!member) {
+      return res.status(404).json({ message: 'Member not found' });
+    }
+
+    member.plan = plan;
+    await member.save();
+
+    res.json({ message: 'Plan updated successfully', plan });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });

@@ -1,0 +1,283 @@
+/* Header Styles */
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.title {
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  color: black;
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-right: 1px solid #eee;
+  padding-right: 0.5rem;
+  min-width: 200px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.userDetails span {
+  color: #333;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memberType {
+  color: #666;
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .userInfo {
+    border-right: none;
+    padding-right: 0;
+  }
+}
+
+/* Button Styles */
+.button {
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.primaryButton {
+  background-color: black;
+  color: white;
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.primaryButton:hover {
+  background-color: white;
+  color: black;
+}
+
+.secondaryButton {
+  background-color: white;
+  color: black;
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.secondaryButton:hover {
+  background-color: black;
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+}
+
+/* Tab Navigation */
+.tabNav {
+  display: flex;
+  gap: clamp(0.5rem, 2vw, 1rem);
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid #eee;
+  background-color: white;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabNav::-webkit-scrollbar {
+  display: none;
+}
+
+.tabButton {
+  background-color: white;
+  color: black;
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .tabNav {
+    padding: 0.75rem 1rem;
+  }
+
+  .tabButton {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+.tabButton:hover {
+  background-color: #f5f5f5;
+}
+
+.tabButton.active {
+  border-bottom-color: black;
+}
+
+/* Overview Styles */
+.overview {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2rem);
+}
+
+.statCard {
+  background: white;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid #eee;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.statCard h3 {
+  color: black;
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.statNumber {
+  color: black;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.statText {
+  color: #333;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 500;
+  margin: 0;
+}
+
+.recentActivity {
+  background: white;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.recentActivity h2 {
+  color: black;
+  margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 2vw, 1rem);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.activityIcon {
+  color: black;
+  flex-shrink: 0;
+}
+
+.noActivity {
+  color: #666;
+  text-align: center;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border: 1px dashed #eee;
+  border-radius: 4px;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+@media (max-width: 480px) {
+  .overview {
+    padding: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .activityItem {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}

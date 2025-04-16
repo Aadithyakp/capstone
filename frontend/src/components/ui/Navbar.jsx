@@ -17,9 +17,9 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className={styles.desktopMenu}>
-            <a href="#features" className={styles.navLink}>Features</a>
+            <a href="/privacy-policy" className={styles.navLink}>Privacy Policy</a>
             {/* <a href="#pricing" className={styles.navLink}>Pricing</a> */}
-            <a href="#about" className={styles.navLink}>About</a>
+            <a href="/contact-us" className={styles.navLink}>Contact Us</a>
             <button 
               className={styles.secondaryButton}
               onClick={() => navigate('/login')}
@@ -46,9 +46,9 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.open : ''}`}>
-        <a href="#features" className={styles.mobileNavLink}>Features</a>
+        <a href="/privacy-policy" className={styles.mobileNavLink}>Privacy Policy</a>
         {/* <a href="#pricing" className={styles.mobileNavLink}>Pricing</a> */}
-        <a href="#about" className={styles.mobileNavLink}>About</a>
+        <a href="/contact-us" className={styles.mobileNavLink}>Contact Us</a>
         <button 
           className={styles.mobileButton}
           onClick={() => navigate('/login')}

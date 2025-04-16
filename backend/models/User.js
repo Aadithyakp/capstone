@@ -35,6 +35,14 @@ const userSchema = new mongoose.Schema({
   profile_picture: {
     type: String // This will store the Cloudinary URL
   },
+  phone: {
+    type: String,
+    trim: true
+  },
+  address: {
+    type: String,
+    trim: true
+  },
   plan: {
     type: String,
     enum: ['free', 'premium'],

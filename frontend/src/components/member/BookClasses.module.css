@@ -1,0 +1,219 @@
+.bookClassesContainer {
+  padding: 2rem;
+  background-color: white;
+}
+
+.searchSection {
+  margin-bottom: 2rem;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: black;
+}
+
+.content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.gymsSection {
+  flex: 1;
+  max-width: 500px;
+}
+
+.gymList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gymCard {
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gymCard:hover {
+  border-color: black;
+}
+
+.gymCard.selected {
+  border-color: black;
+  background-color: #f8f8f8;
+}
+
+.gymHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.gymHeader h3 {
+  margin: 0;
+  color: black;
+  font-size: 1.2rem;
+}
+
+.rating {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.gymDetails {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.gymDetails p {
+  margin: 0.5rem 0;
+}
+
+.classesSection {
+  flex: 2;
+}
+
+.sectionHeader {
+  margin-bottom: 2rem;
+}
+
+.classGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.classCard {
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.classHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.classHeader h3 {
+  margin: 0;
+  color: black;
+  font-size: 1.1rem;
+}
+
+.classType {
+  padding: 0.25rem 0.5rem;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.classInfo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.classInfo strong {
+  color: black;
+  margin-right: 0.5rem;
+}
+
+.classInfo span {
+  color: #666;
+}
+
+.enrollButton,
+.cancelButton {
+  padding: 0.75rem;
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: auto;
+  width: 100%;
+}
+
+.enrollButton {
+  background-color: black;
+  color: white;
+}
+
+.enrollButton:hover:not(:disabled) {
+  background-color: white;
+  color: black;
+}
+
+.enrollButton:disabled {
+  background-color: #f5f5f5;
+  border-color: #eee;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.enrollButton[data-status="enrolled"] {
+  background-color: black;
+  color: white;
+}
+
+.enrollButton[data-status="full"],
+.enrollButton[data-status="unavailable"] {
+  background-color: white;
+  color: black;
+  border-color: black;
+}
+
+.cancelButton {
+  background-color: white;
+  color: black;
+  margin-top: 0.5rem;
+}
+
+.cancelButton:hover {
+  background-color: black;
+  color: white;
+}
+
+.error {
+  color: #dc3545;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.noGyms,
+.noClasses {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+}

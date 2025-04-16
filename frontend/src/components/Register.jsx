@@ -7,7 +7,7 @@ import React, { useState, useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
 
 // Replace this with your actual reCAPTCHA site key
-const RECAPTCHA_SITE_KEY = "6LePlNQqAAAAAGKNN2VUmTmOjGcNrb5O0Zjv4Gci"; // This is Google's test key
+const RECAPTCHA_SITE_KEY = "6LdIIBsrAAAAAKSMgkldAyy-1Ivn-FdtSHDphLOA"; // This is Google's test key
 
 export default function RegisterPage() {
   const navigate = useNavigate();

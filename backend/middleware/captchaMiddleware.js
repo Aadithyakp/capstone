@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Replace with your actual reCAPTCHA secret key
-const RECAPTCHA_SECRET_KEY = '6LePlNQqAAAAAIstsbBONeWzvC9mY6ItprJivEUP'; // This is Google's test secret key
+const RECAPTCHA_SECRET_KEY = '6LdIIBsrAAAAAAtX_uJTOuLRQY5irHL1v8XJ6vmS'; // This is Google's test secret key
 const VERIFICATION_TIMEOUT = 5000; // 5 seconds timeout
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 

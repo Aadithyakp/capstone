@@ -13,7 +13,14 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',  // Local development
+    'https://capstone-j29wjj3y7-aadithyakps-projects.vercel.app'  // Vercel production
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+}));;
 app.use(express.json());
 
 // Connect to MongoDB

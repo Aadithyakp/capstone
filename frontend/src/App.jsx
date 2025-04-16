@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 import GymOwnerDashboard from './components/gym-owner/GymOwnerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Payment from './components/Payment';
-import PrivacyPolicy from './components/PrivacyPolicy';
+import PrivacyPolicy from './components/PrivacyPolicy.jsx';
 import ContactUs from './components/ContactUs';
 import './App.css';
 

@@ -1,4 +1,4 @@
-const API_URL = 'https://capstone-31d0.onrender.com';
+const API_URL = 'https://capstone-31d0.onrender.com/api/';
 
 const getToken = () => localStorage.getItem('token');
 

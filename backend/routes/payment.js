@@ -48,8 +48,8 @@ router.post('/create-checkout-session', auth, async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment?error=${encodeURIComponent('Payment was cancelled')}`,
+            success_url: `${process.env.FRONTEND_URL || 'https://capstone-omega-one.vercel.app'}/payment?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.FRONTEND_URL || 'https://capstone-omega-one.vercel.app'}/payment?error=${encodeURIComponent('Payment was cancelled')}`,
             customer_email: user.email,
             metadata: {
                 userId: user._id.toString(),

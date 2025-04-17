@@ -18,7 +18,7 @@ const Payment = () => {
       setError('');
       
       // Verify payment status with backend
-      const response = await fetch(`http://localhost:5000/api/payment/payment-success?session_id=${sessionId}`, {
+      const response = await fetch(`https://capstone-31d0.onrender.com/api/payment/payment-success?session_id=${sessionId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

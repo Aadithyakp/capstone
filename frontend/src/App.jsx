@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 import GymOwnerDashboard from './components/gym-owner/GymOwnerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Payment from './components/Payment';
-import PrivacyPolicy from './components/PrivacyPolicy.jsx';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import ContactUs from './components/ContactUs';
 import './App.css';
 
@@ -66,38 +66,18 @@ function App() {
           <Route path="/contact-us" element={<ContactUs />} />
           
           {/* Protected routes */}
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gym-owner-dashboard/*"
-            element={
-              <ProtectedRoute>
-                <GymOwnerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment"
-            element={
-              <ProtectedRoute>
-                <Payment />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment-success"
-            element={
-              <ProtectedRoute>
-                <Navigate to="/dashboard" replace />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+            <Route index element={<Dashboard />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+
+          <Route path="/gym-owner-dashboard" element={<ProtectedRoute><GymOwnerDashboard /></ProtectedRoute>}>
+            <Route index element={<GymOwnerDashboard />} />
+            <Route path="*" element={<Navigate to="/gym-owner-dashboard" replace />} />
+          </Route>
+
+          <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+          <Route path="/payment-success" element={<ProtectedRoute><Navigate to="/dashboard" replace /></ProtectedRoute>} />
           
           {/* Catch all other routes and redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />

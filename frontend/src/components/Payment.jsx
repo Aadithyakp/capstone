@@ -124,7 +124,7 @@ const Payment = () => {
       }
 
       // Create a Stripe checkout session
-      const response = await fetch('http://localhost:5000/api/payment/create-checkout-session', {
+      const response = await fetch('https://capstone-31d0.onrender.com/api/payment/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

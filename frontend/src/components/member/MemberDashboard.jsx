@@ -24,6 +24,12 @@ export default function MemberDashboard() {
         const profile = await getUserProfile();
         setUserData(profile);
 
+        // Check if user is inactive
+        if (profile.status === 'inactive') {
+          navigate('/subscription-expired');
+          return;
+        }
+
         // Mock data for demonstration
         setEnrolledClasses([
           { id: 1, name: 'Yoga', schedule: 'Monday 10:00 AM' },

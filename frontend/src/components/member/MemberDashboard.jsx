@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MemberDashboard.module.css';
 import { logout, getUserProfile } from '../../utils/api';
+import defaultAvatar from '../../assets/images/default-avatar.png';
 import MemberSettings from './MemberSettings';
 import BookClasses from './BookClasses';
-import DashboardHeader from './components/DashboardHeader';
-import TabNavigation from './components/TabNavigation';
-import Overview from './components/Overview';
 
 export default function MemberDashboard() {
   const navigate = useNavigate();
@@ -23,12 +21,6 @@ export default function MemberDashboard() {
         setLoading(true);
         const profile = await getUserProfile();
         setUserData(profile);
-
-        // Check if user is inactive
-        if (profile.status === 'inactive') {
-          navigate('/subscription-expired');
-          return;
-        }
 
         // Mock data for demonstration
         setEnrolledClasses([
@@ -66,30 +58,106 @@ export default function MemberDashboard() {
     return <div className={styles.loading}>Loading...</div>;
   }
 
+  if (userData?.status !== 'active') {
+    return (
+      <div className={styles.subscriptionExpired}>
+        <h2>Subscription Expired</h2>
+        <p>Please renew your subscription to continue accessing the gym facilities.</p>
+        <button 
+          className={styles.renewButton}
+          onClick={() => navigate('/payment')}
+        >
+          Renew Now
+        </button>
+      </div>
+    );
+  }
+
+  const renderOverview = () => (
+    <div className={styles.overview}>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <h3>Enrolled Classes</h3>
+          <p className={styles.statNumber}>{enrolledClasses.length}</p>
+        </div>
+        <div className={styles.statCard}>
+          <h3>Upcoming Classes</h3>
+          <p className={styles.statNumber}>{upcomingClasses.length}</p>
+        </div>
+        <div className={styles.statCard}>
+          <h3>Membership</h3>
+          <p className={styles.statText}>{userData?.plan === 'premium' ? 'Premium' : 'Free'}</p>
+        </div>
+        <div className={styles.statCard}>
+          <h3>Status</h3>
+          <p className={styles.statText}>{userData?.status === 'active' ? 'Active' : 'Inactive'}</p>
+        </div>
+      </div>
+
+      <div className={styles.recentActivity}>
+        <h2>Recent Activity</h2>
+        {recentActivities.length === 0 ? (
+          <p className={styles.noActivity}>No recent activities</p>
+        ) : (
+          <div className={styles.activityList}>
+            {recentActivities.map((activity, index) => (
+              <div key={index} className={styles.activityItem}>
+                <span className={styles.activityIcon}>•</span>
+                <span className={styles.activityText}>{activity}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className={styles.dashboard}>
-      <DashboardHeader 
-        userData={userData}
-        onSettingsClick={() => setActiveTab('settings')}
-        onLogout={handleLogout}
-      />
+      <header className={styles.header}>
+        <h1 className={styles.title}>Member Dashboard</h1>
+        <div className={styles.headerRight}>
+          <div className={styles.userInfo}>
+            <img
+              src={defaultAvatar}
+              alt="Profile"
+              className={styles.avatar}
+            />
+            <div className={styles.userDetails}>
+              <span>Welcome, {userData?.full_name || 'Member'}!</span>
+              <span className={styles.memberType}>
+                {userData?.plan === 'premium' ? 'Premium' : 'Free'} Member
+              </span>
+            </div>
+          </div>
+          <button onClick={() => setActiveTab('settings')} className={styles.settingsButton}>
+            Settings
+          </button>
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Logout
+          </button>
+        </div>
+      </header>
 
-      <TabNavigation 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+      <nav className={styles.tabNav}>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'overview' ? styles.active : ''}`}
+          onClick={() => setActiveTab('overview')}
+        >
+          Overview
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'book' ? styles.active : ''}`}
+          onClick={() => setActiveTab('book')}
+        >
+          Book Classes
+        </button>
+      </nav>
 
       <main className={styles.mainContent}>
-        {activeTab === 'overview' && (
-          <Overview 
-            userData={userData}
-            enrolledClasses={enrolledClasses}
-            upcomingClasses={upcomingClasses}
-            recentActivities={recentActivities}
-          />
-        )}
+        {activeTab === 'overview' && renderOverview()}
         {activeTab === 'book' && <BookClasses />}
-        {activeTab === 'settings' && <MemberSettings />}
+        {activeTab === 'settings' && <MemberSettings onNavigate={setActiveTab} />}
       </main>
     </div>
   );
